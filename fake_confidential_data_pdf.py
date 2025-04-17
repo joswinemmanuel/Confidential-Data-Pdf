@@ -3,6 +3,16 @@ from reportlab.pdfgen import canvas
 import random
 import string
 import os
+import random
+from datetime import date, timedelta
+
+def random_date(start_date, end_date):
+    """Generates a random date between two given dates."""
+    time_between_dates = end_date - start_date
+    days_between_dates = time_between_dates.days
+    random_number_of_days = random.randrange(days_between_dates)
+    random_date = start_date + timedelta(days=random_number_of_days)
+    return random_date
 
 def generate_fake_data(num_entries=20):
     """Generates fake confidential data."""
@@ -11,7 +21,8 @@ def generate_fake_data(num_entries=20):
         website = ''.join(random.choice(string.ascii_lowercase) for i in range(8)) + ".com"
         username = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(10))
         password = ''.join(random.choice(string.ascii_letters + string.digits + "!@#$%^&*()") for i in range(16))
-        data.append((website, username, password))
+        date_of_create = random_date(date(2020, 1, 1), date.today())
+        data.append((website, username, password, date_of_create))
     return data
 
 def create_pdf(filename="confidential_data.pdf", data=None):
@@ -29,12 +40,14 @@ def create_pdf(filename="confidential_data.pdf", data=None):
     c.line(50, y, width - 50, y)  # Horizontal line
     y -= 20
 
-    for website, username, password in data:
+    for website, username, password, date in data:
         c.drawString(50, y, f"Website: {website}")
         y -= 15
         c.drawString(50, y, f"Username: {username}")
         y -= 15
         c.drawString(50, y, f"Password: {password}")
+        y -= 15
+        c.drawString(50, y, f"Date: {date}")
         y -= 25
         if y < 50:
             c.showPage()  # Start a new page
@@ -59,5 +72,6 @@ def check_pdf_size(filename):
         return False
 
 # Generate and save the PDF
+
 create_pdf()
 check_pdf_size("confidential_data.pdf")
